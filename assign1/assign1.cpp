@@ -203,13 +203,19 @@ int main (int argc, char ** argv)
 
   glutInit(&argc,argv);
   
+  //creates a window
+  glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH); 
+  glutInitWindowPosition(0, 0); 
+  glutInitWindowSize(640, 480); 
+  glutCreateWindow("Ryan's Assignment 1"); 
+
   /*
     create a window here..should be double buffered and use depth testing
   
     the code past here will segfault if you don't have a window set up....
     replace the exit once you add those calls.
   */
-  exit(0);
+  //exit(0);
 
   /* tells glut to use a particular display function to redraw */
   glutDisplayFunc(display);
