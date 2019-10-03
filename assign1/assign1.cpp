@@ -60,6 +60,11 @@ void myinit()
 {
   /* setup gl view here */
   glClearColor(0.0, 0.0, 0.0, 0.0);
+
+  //enable depth buffering
+  glEnable(GL_DEPTH_TEST); 
+
+  //glClearDepth(1.0); 
 }
 
 void display()
@@ -68,6 +73,9 @@ void display()
   /* replace this code with your height field implementation */
   /* you may also want to precede it with your 
 rotation/translation/scaling */
+
+  //clear buffers
+  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); 
 
   glBegin(GL_POLYGON);
 
@@ -81,6 +89,9 @@ rotation/translation/scaling */
   glVertex3f(0.5, -0.5, 0.0);
 
   glEnd();
+
+  //swap buffers
+  glutSwapBuffers(); 
 }
 
 void menufunc(int value)
@@ -203,7 +214,7 @@ int main (int argc, char ** argv)
 
   glutInit(&argc,argv);
   
-  //creates a window
+  //creates a window that's double buffered and with depth testing
   glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH); 
   glutInitWindowPosition(0, 0); 
   glutInitWindowSize(640, 480); 
