@@ -9,6 +9,7 @@
 #include <OpenGL/glu.h>
 #include <GLUT/glut.h>
 #include <pic.h>
+#include <iostream>
 
 int g_iMenuId;
 
@@ -77,18 +78,36 @@ rotation/translation/scaling */
   //clear buffers
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); 
 
-  glBegin(GL_POLYGON);
+  //clear matrix
+  glLoadIdentity(); 
+  //gluLookAt(0, 0, 20, 0, 0, 0, 0, 1, 0); 
+  glScalef(0.0025, 0.0025, 0); 
+  //glRotatef(60, 1, 0, 0); 
+  //glTranslatef(-340, -240, 0); 
 
-  glColor3f(1.0, 1.0, 1.0);
-  glVertex3f(-0.5, -0.5, 0.0);
-  glColor3f(0.0, 0.0, 1.0);
-  glVertex3f(-0.5, 0.5, 0.0);
-  glColor3f(0.0, 0.0, 0.0);
-  glVertex3f(0.5, 0.5, 0.0);
-  glColor3f(1.0, 1.0, 0.0);
-  glVertex3f(0.5, -0.5, 0.0);
+  for(int i = 0; i < (g_pHeightData->ny) - 1; i++)
+  {
+    //begin drawing triangle strips
+    glBegin(GL_TRIANGLE_STRIP); 
 
-  glEnd();
+    for(int j = 0; j < g_pHeightData->nx; j++)
+    {
+      unsigned char heightValFirst, heightValSecond; 
+
+      heightValFirst = PIC_PIXEL(g_pHeightData, j, i, 0); 
+      heightValSecond = PIC_PIXEL(g_pHeightData, j, i + 1, 0); 
+
+      //std::cout << heightValFirst << ", " << heightValSecond << std::endl; 
+
+      glColor3f(heightValFirst/255.0, heightValFirst/255.0, 1.0);
+      glVertex3f(j, i, heightValFirst/255.0); 
+      glColor3f(heightValSecond/255.0, heightValSecond/255.0, 1.0); 
+      glVertex3f(j, i + 1, heightValSecond/255.0); 
+    }
+
+    //end drawing
+    glEnd(); 
+  }
 
   //swap buffers
   glutSwapBuffers(); 
