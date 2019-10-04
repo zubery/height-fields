@@ -87,10 +87,19 @@ rotation/translation/scaling */
   gluLookAt(0.0, 0.0, 175.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
 
   //scale rotate and translate to roughly center image at a slight angle
-  glScalef(0.5, 0.5, 0.5); 
+  //includes extra transformations based on mouse/key input
+  glScalef(0.5 * g_vLandScale[0], 0.5  * g_vLandScale[1], 
+    0.5  * g_vLandScale[2]); 
+
   glRotatef(-45, 1.0, 0.0, 0.0); 
   glRotatef(-15.0, 0.0, 1.0, 1.0); 
+  glRotatef(g_vLandRotate[0], 1.0, 0.0, 0.0); 
+  glRotatef(g_vLandRotate[1], 0.0, 1.0, 0.0); 
+  glRotatef(g_vLandRotate[2], 0.0, 0.0, 1.0); 
+
   glTranslatef(-g_pHeightData->nx * 0.5, -g_pHeightData->ny * 0.5, 0);
+  glTranslatef(g_vLandTranslate[0] * 100.0, g_vLandTranslate[1] * 100.0, 
+    g_vLandTranslate[2] * 100.0); 
 
   //loops through all the rows of pixels
   for(int i = 0; i < (g_pHeightData->ny) - 1; i++)
@@ -125,6 +134,9 @@ rotation/translation/scaling */
 
 void reshape(int w, int h)
 {
+  //set up image size
+  glViewport(0, 0, width, height);
+
   //projection related changes, sets field of view to 60 degrees
   glMatrixMode(GL_PROJECTION);
   glLoadIdentity();  
@@ -132,6 +144,7 @@ void reshape(int w, int h)
 
   //modelview related changes
   glMatrixMode(GL_MODELVIEW); 
+  glLoadIdentity(); 
 }
 
 void menufunc(int value)
@@ -194,6 +207,8 @@ void mousedrag(int x, int y)
       }
       break;
   }
+
+  glutPostRedisplay(); 
   g_vMousePos[0] = x;
   g_vMousePos[1] = y;
 }
@@ -235,6 +250,46 @@ void mousebutton(int button, int state, int x, int y)
 
   g_vMousePos[0] = x;
   g_vMousePos[1] = y;
+}
+
+void keyboard(unsigned char key, int x, int y)
+{
+  //points on 'a'
+  if(key == 'a')
+  {
+    glPolygonMode(GL_FRONT_AND_BACK, GL_POINT); 
+    glutPostRedisplay(); 
+  }
+  //wireframe on 's'
+  else if(key == 's')
+  {
+    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); 
+    glutPostRedisplay(); 
+  }
+  //filled triangles on 'd'
+  else if(key == 'd')
+  {
+    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL); 
+    glutPostRedisplay(); 
+  }
+  //button controls for mac because CTRL doesn't work for scaling
+  //q to zoom in, e to zoom out
+  else if(key == 'q')
+  {
+    g_vLandScale[0] += 0.05; 
+    g_vLandScale[1] += 0.05; 
+    g_vLandScale[2] += 0.05; 
+  }
+  else if(key == 'e')
+  {
+    g_vLandScale[0] -= 0.05; 
+    g_vLandScale[1] -= 0.05; 
+    g_vLandScale[2] -= 0.05; 
+  }
+  else if(key == 'z')
+  {
+    g_ControlState = ROTATE;
+  }
 }
 
 int main (int argc, char ** argv)
@@ -281,6 +336,8 @@ int main (int argc, char ** argv)
   glutPassiveMotionFunc(mouseidle);
   /* callback for mouse button changes */
   glutMouseFunc(mousebutton);
+  //callback for keyboard
+  glutKeyboardFunc(keyboard);
 
   /* do initialization */
   myinit();
