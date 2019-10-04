@@ -18,6 +18,10 @@ int g_iLeftMouseButton = 0;    /* 1 if pressed, 0 if not */
 int g_iMiddleMouseButton = 0;
 int g_iRightMouseButton = 0;
 
+//window width and height
+float width = 640.0; 
+float height = 480.0; 
+
 typedef enum { ROTATE, TRANSLATE, SCALE } CONTROLSTATE;
 
 CONTROLSTATE g_ControlState = ROTATE;
@@ -80,10 +84,11 @@ rotation/translation/scaling */
 
   //clear matrix
   glLoadIdentity(); 
+  gluLookAt(0.0, 0.0, 100.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
   //gluLookAt(0, 0, 20, 0, 0, 0, 0, 1, 0); 
-  glScalef(0.0025, 0.0025, 0); 
-  //glRotatef(60, 1, 0, 0); 
-  //glTranslatef(-340, -240, 0); 
+  glScalef(0.5, 0.5, 0.5); 
+  glRotatef(-60, 1, 0, 0); 
+  //glTranslatef(-g_pHeightData->nx, -g_pHeightData->ny, 0);
 
   for(int i = 0; i < (g_pHeightData->ny) - 1; i++)
   {
@@ -99,10 +104,10 @@ rotation/translation/scaling */
 
       //std::cout << heightValFirst << ", " << heightValSecond << std::endl; 
 
-      glColor3f(heightValFirst/255.0, heightValFirst/255.0, 1.0);
-      glVertex3f(j, i, heightValFirst/255.0); 
-      glColor3f(heightValSecond/255.0, heightValSecond/255.0, 1.0); 
-      glVertex3f(j, i + 1, heightValSecond/255.0); 
+      glColor3f(heightValFirst/255.0, 1.0, heightValFirst/255.0);
+      glVertex3f(j, i, heightValFirst/5.0); 
+      glColor3f(heightValSecond/255.0, 1.0, heightValSecond/255.0); 
+      glVertex3f(j, i + 1, heightValSecond/5.0); 
     }
 
     //end drawing
@@ -111,6 +116,17 @@ rotation/translation/scaling */
 
   //swap buffers
   glutSwapBuffers(); 
+}
+
+void reshape(int w, int h)
+{
+  //projection related changes
+  glMatrixMode(GL_PROJECTION);
+  glLoadIdentity();  
+  gluPerspective(90.0, width/height, 0.5, 300.0); 
+
+  //modelview related changes
+  glMatrixMode(GL_MODELVIEW); 
 }
 
 void menufunc(int value)
@@ -236,7 +252,7 @@ int main (int argc, char ** argv)
   //creates a window that's double buffered and with depth testing
   glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH); 
   glutInitWindowPosition(0, 0); 
-  glutInitWindowSize(640, 480); 
+  glutInitWindowSize(width, height); 
   glutCreateWindow("Ryan's Assignment 1"); 
 
   /*
@@ -249,6 +265,9 @@ int main (int argc, char ** argv)
 
   /* tells glut to use a particular display function to redraw */
   glutDisplayFunc(display);
+
+  //tells glut to use a particular reshape function
+  glutReshapeFunc(reshape); 
   
   /* allow the user to quit using the right mouse button menu */
   g_iMenuId = glutCreateMenu(menufunc);
