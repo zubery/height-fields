@@ -234,19 +234,19 @@ void mousebutton(int button, int state, int x, int y)
       g_iRightMouseButton = (state==GLUT_DOWN);
       break;
   }
- 
-  switch(glutGetModifiers())
-  {
-    case GLUT_ACTIVE_CTRL:
-      g_ControlState = TRANSLATE;
-      break;
-    case GLUT_ACTIVE_SHIFT:
-      g_ControlState = SCALE;
-      break;
-    default:
-      g_ControlState = ROTATE;
-      break;
-  }
+
+  // switch(glutGetModifiers())
+  // {
+  //   case GLUT_ACTIVE_SHIFT:
+  //     g_ControlState = TRANSLATE;
+  //     break;
+  //   case GLUT_ACTIVE_CTRL:
+  //     g_ControlState = SCALE;
+  //     break;
+  //   default:
+  //     g_ControlState = ROTATE;
+  //     break;
+  // }
 
   g_vMousePos[0] = x;
   g_vMousePos[1] = y;
@@ -272,23 +272,28 @@ void keyboard(unsigned char key, int x, int y)
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL); 
     glutPostRedisplay(); 
   }
+  else 
+  {
+
+  }
+
   //button controls for mac because CTRL doesn't work for scaling
   //q to zoom in, e to zoom out
-  else if(key == 'q')
+  if(key == 'q')
   {
-    g_vLandScale[0] += 0.05; 
-    g_vLandScale[1] += 0.05; 
-    g_vLandScale[2] += 0.05; 
+    g_ControlState = TRANSLATE;
   }
   else if(key == 'e')
   {
-    g_vLandScale[0] -= 0.05; 
-    g_vLandScale[1] -= 0.05; 
-    g_vLandScale[2] -= 0.05; 
+    g_ControlState = SCALE; 
   }
-  else if(key == 'z')
+  else if(key == 'w')
   {
     g_ControlState = ROTATE;
+  }
+  else 
+  {
+
   }
 }
 
