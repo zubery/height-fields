@@ -68,8 +68,6 @@ void myinit()
 
   //enable depth buffering
   glEnable(GL_DEPTH_TEST); 
-
-  //glClearDepth(1.0); 
 }
 
 void display()
@@ -84,30 +82,37 @@ rotation/translation/scaling */
 
   //clear matrix
   glLoadIdentity(); 
-  gluLookAt(0.0, 0.0, 100.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
-  //gluLookAt(0, 0, 20, 0, 0, 0, 0, 1, 0); 
-  glScalef(0.5, 0.5, 0.5); 
-  glRotatef(-60, 1, 0, 0); 
-  //glTranslatef(-g_pHeightData->nx, -g_pHeightData->ny, 0);
 
+  //look at matrix
+  gluLookAt(0.0, 0.0, 175.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
+
+  //scale rotate and translate to roughly center image at a slight angle
+  glScalef(0.5, 0.5, 0.5); 
+  glRotatef(-45, 1.0, 0.0, 0.0); 
+  glRotatef(-15.0, 0.0, 1.0, 1.0); 
+  glTranslatef(-g_pHeightData->nx * 0.5, -g_pHeightData->ny * 0.5, 0);
+
+  //loops through all the rows of pixels
   for(int i = 0; i < (g_pHeightData->ny) - 1; i++)
   {
     //begin drawing triangle strips
     glBegin(GL_TRIANGLE_STRIP); 
 
+    //loops through all the columns of pixels
     for(int j = 0; j < g_pHeightData->nx; j++)
     {
       unsigned char heightValFirst, heightValSecond; 
 
+      //calculate height values from pic_pixel
       heightValFirst = PIC_PIXEL(g_pHeightData, j, i, 0); 
       heightValSecond = PIC_PIXEL(g_pHeightData, j, i + 1, 0); 
 
-      //std::cout << heightValFirst << ", " << heightValSecond << std::endl; 
-
-      glColor3f(heightValFirst/255.0, 1.0, heightValFirst/255.0);
-      glVertex3f(j, i, heightValFirst/5.0); 
-      glColor3f(heightValSecond/255.0, 1.0, heightValSecond/255.0); 
-      glVertex3f(j, i + 1, heightValSecond/5.0); 
+      //draw vertices at x, y, and calculated height value for z
+      //color also dependent on height value (varying shades of blue)
+      glColor3f(heightValFirst/255.0, heightValFirst/255.0, 1.0);
+      glVertex3f(j, i, heightValFirst/10.0); 
+      glColor3f(heightValSecond/255.0, heightValSecond/255.0, 1.0); 
+      glVertex3f(j, i + 1, heightValSecond/10.0); 
     }
 
     //end drawing
@@ -120,10 +125,10 @@ rotation/translation/scaling */
 
 void reshape(int w, int h)
 {
-  //projection related changes
+  //projection related changes, sets field of view to 60 degrees
   glMatrixMode(GL_PROJECTION);
   glLoadIdentity();  
-  gluPerspective(90.0, width/height, 0.5, 300.0); 
+  gluPerspective(60.0, width/height, 0.5, 300.0); 
 
   //modelview related changes
   glMatrixMode(GL_MODELVIEW); 
@@ -254,14 +259,6 @@ int main (int argc, char ** argv)
   glutInitWindowPosition(0, 0); 
   glutInitWindowSize(width, height); 
   glutCreateWindow("Ryan's Assignment 1"); 
-
-  /*
-    create a window here..should be double buffered and use depth testing
-  
-    the code past here will segfault if you don't have a window set up....
-    replace the exit once you add those calls.
-  */
-  //exit(0);
 
   /* tells glut to use a particular display function to redraw */
   glutDisplayFunc(display);
