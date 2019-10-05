@@ -10,6 +10,7 @@
 #include <GLUT/glut.h>
 #include <pic.h>
 #include <iostream>
+#include <math.h>
 
 int g_iMenuId;
 
@@ -18,13 +19,17 @@ int g_iLeftMouseButton = 0;    /* 1 if pressed, 0 if not */
 int g_iMiddleMouseButton = 0;
 int g_iRightMouseButton = 0;
 
+typedef enum { ROTATE, TRANSLATE, SCALE } CONTROLSTATE;
+
+CONTROLSTATE g_ControlState = ROTATE;
+
+#define M_PI 3.14159265358979323846
+
 //window width and height
 float width = 640.0; 
 float height = 480.0; 
 
-typedef enum { ROTATE, TRANSLATE, SCALE } CONTROLSTATE;
-
-CONTROLSTATE g_ControlState = ROTATE;
+float anim = 0.0; 
 
 /* state of the world */
 float g_vLandRotate[3] = {0.0, 0.0, 0.0};
@@ -33,6 +38,9 @@ float g_vLandScale[3] = {1.0, 1.0, 1.0};
 
 /* see <your pic directory>/pic.h for type Pic */
 Pic * g_pHeightData;
+
+//bool to trigger animation
+bool doAnimation = false; 
 
 /* Write a screenshot to the specified filename */
 void saveScreenshot (char *filename)
@@ -61,6 +69,11 @@ void saveScreenshot (char *filename)
   pic_free(in);
 }
 
+float waveOffset(float x, float y)
+{
+  return sinf(((x + y + 1) * anim) * (M_PI / 180.0)); 
+}
+
 void myinit()
 {
   /* setup gl view here */
@@ -72,11 +85,6 @@ void myinit()
 
 void display()
 {
-  /* draw 1x1 cube about origin */
-  /* replace this code with your height field implementation */
-  /* you may also want to precede it with your 
-rotation/translation/scaling */
-
   //clear buffers
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); 
 
@@ -119,9 +127,9 @@ rotation/translation/scaling */
       //draw vertices at x, y, and calculated height value for z
       //color also dependent on height value (varying shades of blue)
       glColor3f(heightValFirst/255.0, heightValFirst/255.0, 1.0);
-      glVertex3f(j, i, heightValFirst/10.0); 
+      glVertex3f(j, i, (heightValFirst/5.0) + waveOffset(j, i)); 
       glColor3f(heightValSecond/255.0, heightValSecond/255.0, 1.0); 
-      glVertex3f(j, i + 1, heightValSecond/10.0); 
+      glVertex3f(j, i + 1, (heightValSecond/5.0) + waveOffset(j, i + 1)); 
     }
 
     //end drawing
@@ -159,7 +167,14 @@ void menufunc(int value)
 
 void doIdle()
 {
-  /* do some stuff... */
+  if(doAnimation)
+  {
+    anim += 0.1; 
+  }
+  else 
+  {
+    anim = 0.0; 
+  }
 
   /* make the screen update */
   glutPostRedisplay();
@@ -272,13 +287,9 @@ void keyboard(unsigned char key, int x, int y)
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL); 
     glutPostRedisplay(); 
   }
-  else 
-  {
 
-  }
-
-  //button controls for mac because CTRL doesn't work for scaling
-  //q to zoom in, e to zoom out
+  //button controls for mac because CTRL and ALT don't work
+  //q to toggle translate, e for scale, w for rotate (then use mouse)
   if(key == 'q')
   {
     g_ControlState = TRANSLATE;
@@ -291,9 +302,11 @@ void keyboard(unsigned char key, int x, int y)
   {
     g_ControlState = ROTATE;
   }
-  else 
-  {
 
+  //toggles animation on x keycode
+  if(key == 'x')
+  {
+    doAnimation = !doAnimation; 
   }
 }
 
