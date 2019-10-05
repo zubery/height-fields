@@ -29,7 +29,8 @@ CONTROLSTATE g_ControlState = ROTATE;
 float width = 640.0; 
 float height = 480.0; 
 
-float anim = 0.0; 
+float animOffset = 0.0;
+float wavelength = 0.0; 
 
 /* state of the world */
 float g_vLandRotate[3] = {0.0, 0.0, 0.0};
@@ -69,9 +70,12 @@ void saveScreenshot (char *filename)
   pic_free(in);
 }
 
+//calculates wave offset to add to height value
+//sin of (x + y) to make wave going diagonally through field
+//other values to get behavior, wavelength as desired
 float waveOffset(float x, float y)
 {
-  return sinf(((x + y + 1) * anim) * (M_PI / 180.0)); 
+  return sinf(((x + y + 1) + animOffset) * (M_PI / 180.0) * wavelength) * 5.0;
 }
 
 void myinit()
@@ -126,6 +130,7 @@ void display()
 
       //draw vertices at x, y, and calculated height value for z
       //color also dependent on height value (varying shades of blue)
+      //includes height offset for wave animation
       glColor3f(heightValFirst/255.0, heightValFirst/255.0, 1.0);
       glVertex3f(j, i, (heightValFirst/5.0) + waveOffset(j, i)); 
       glColor3f(heightValSecond/255.0, heightValSecond/255.0, 1.0); 
@@ -167,13 +172,20 @@ void menufunc(int value)
 
 void doIdle()
 {
+  //if in middle of animation, adjusts values for the wave offset
   if(doAnimation)
   {
-    anim += 0.1; 
+    animOffset += 1.0; 
+    if(wavelength < 5.0)
+    {
+      wavelength += 0.05; 
+    }
   }
+  //otherwise, resets them
   else 
   {
-    anim = 0.0; 
+    animOffset = 0.0; 
+    wavelength = 0.0; 
   }
 
   /* make the screen update */
