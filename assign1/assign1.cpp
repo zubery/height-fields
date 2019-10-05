@@ -1,5 +1,6 @@
 /*
-  CSCI 480 Computer Graphics
+  Ryan Zubery
+  CSCI 420 Computer Graphics
   Assignment 1: Height Fields
   C++ starter code
 */
