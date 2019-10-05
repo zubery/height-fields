@@ -23,12 +23,14 @@ typedef enum { ROTATE, TRANSLATE, SCALE } CONTROLSTATE;
 
 CONTROLSTATE g_ControlState = ROTATE;
 
+//macro defining pi for wave function
 #define M_PI 3.14159265358979323846
 
 //window width and height
 float width = 640.0; 
 float height = 480.0; 
 
+//variables for wave function
 float animOffset = 0.0;
 float wavelength = 0.0; 
 
@@ -181,11 +183,19 @@ void doIdle()
       wavelength += 0.05; 
     }
   }
-  //otherwise, resets them
+  //otherwise, "rewinds" values to naturally stop animation
+  //a consequence of this is toggling back and forth is smooth
   else 
-  {
-    animOffset = 0.0; 
-    wavelength = 0.0; 
+  { 
+    if(animOffset > 0)
+    {
+      animOffset -= 1.0;
+    }
+
+    if(wavelength > 0)
+    {
+      wavelength -= 0.05; 
+    }
   }
 
   /* make the screen update */
@@ -262,6 +272,8 @@ void mousebutton(int button, int state, int x, int y)
       break;
   }
 
+  //commented these lines out because they don't work with mac
+  //(and I think my controls are easier anyways)
   // switch(glutGetModifiers())
   // {
   //   case GLUT_ACTIVE_SHIFT:
@@ -301,18 +313,18 @@ void keyboard(unsigned char key, int x, int y)
   }
 
   //button controls for mac because CTRL and ALT don't work
-  //q to toggle translate, e for scale, w for rotate (then use mouse)
+  //q to toggle scale, e for rotate, w for translate (then use mouse)
   if(key == 'q')
   {
-    g_ControlState = TRANSLATE;
-  }
-  else if(key == 'e')
-  {
-    g_ControlState = SCALE; 
+     g_ControlState = SCALE; 
   }
   else if(key == 'w')
   {
     g_ControlState = ROTATE;
+  }
+  else if(key == 'e')
+  {
+    g_ControlState = TRANSLATE;
   }
 
   //toggles animation on x keycode
@@ -366,7 +378,7 @@ int main (int argc, char ** argv)
   glutPassiveMotionFunc(mouseidle);
   /* callback for mouse button changes */
   glutMouseFunc(mousebutton);
-  //callback for keyboard
+  //callback for keyboard input
   glutKeyboardFunc(keyboard);
 
   /* do initialization */
